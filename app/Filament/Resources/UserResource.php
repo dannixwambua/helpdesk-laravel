@@ -7,11 +7,13 @@ use App\Filament\Resources\UserResource\RelationManagers\RolesRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\TicketsRelationManager;
 use App\Models\Unit;
 use App\Models\User;
+use App\Settings\GeneralSettings;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
@@ -22,34 +24,53 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Master Data';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('User');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('unit_id')
-                    ->options(Unit::all()
-                        ->pluck('name', 'id'))
+                    ->label(__('Unit'))
+                    ->options(Unit::all()->pluck('name', 'id'))
                     ->searchable(),
                 Forms\Components\TextInput::make('name')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
+                    ->translateLabel()
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->translateLabel()
+                    ->native(false)
+                    ->displayFormat(app(GeneralSettings::class)->datetime_format),
                 Forms\Components\TextInput::make('password')
+                    ->translateLabel()
                     ->password()
-                    ->required()
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn (string $context): bool => $context === 'create')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('identity')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
+                    ->translateLabel()
                     ->tel()
                     ->maxLength(255),
                 Forms\Components\Toggle::make('is_active')
+                    ->translateLabel()
                     ->required(),
             ])
         ;
@@ -59,10 +80,14 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TagsColumn::make('roles.name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->translateLabel(),
+                Tables\Columns\TextColumn::make('email')
+                    ->translateLabel(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->translateLabel(),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->translateLabel()
                     ->boolean(),
             ])
             ->filters([
@@ -70,7 +95,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Impersonate::make()
-                    ->redirectTo(route('filament.pages.dashboard')),
+                    ->redirectTo(route('filament.admin.pages.dashboard')),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])

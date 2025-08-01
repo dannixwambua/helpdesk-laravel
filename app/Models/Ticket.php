@@ -1,69 +1,98 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use App\Settings\AccountSettings;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
-/**
- * Class Ticket.
- *
- * @property int $id
- * @property int $priority_id
- * @property int $unit_id
- * @property int $owner_id
- * @property int $problem_category_id
- * @property string $title
- * @property string $description
- * @property int $ticket_statuses_id
- * @property null|int $responsible_id
- * @property null|Carbon $created_at
- * @property null|Carbon $updated_at
- * @property null|Carbon $approved_at
- * @property null|Carbon $solved_at
- * @property null|string $deleted_at
- * @property Priority $priority
- * @property Unit $unit
- * @property null|User $user
- * @property ProblemCategory $problem_category
- * @property TicketStatus $ticket_status
- * @property Collection|Comment[] $comments
- */
 class Ticket extends Model
 {
     use SoftDeletes;
-    protected $table = 'tickets';
+    use LogsActivity;
 
     protected $casts = [
-        'priority_id' => 'int',
-        'unit_id' => 'int',
-        'owner_id' => 'int',
-        'problem_category_id' => 'int',
-        'ticket_statuses_id' => 'int',
-        'responsible_id' => 'int',
-        'approved_at' => 'datetime',
-        'solved_at' => 'datetime',
+        'status_updated_at' => 'datetime',
     ];
 
     protected $fillable = [
         'priority_id',
         'unit_id',
         'owner_id',
-        'problem_category_id',
+        'category_id',
         'title',
         'description',
         'ticket_statuses_id',
+        'status_updated_at',
         'responsible_id',
-        'approved_at',
-        'solved_at',
     ];
 
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Ticket $ticket) {
+            if (array_key_exists('ticket_statuses_id', $ticket->getDirty())
+                && (
+                    (
+                        array_key_exists('ticket_statuses_id', $ticket->getOriginal())
+                        && $ticket->getDirty()['ticket_statuses_id'] != $ticket->getOriginal()['ticket_statuses_id']
+                    )
+                    || !array_key_exists('ticket_statuses_id', $ticket->getOriginal())
+                )
+            ) {
+                $ticket->status_updated_at = now();
+            }
+        });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                '*',
+                'priority.name',
+                'unit.name',
+                'owner.name',
+                'responsible.name',
+                'category.name',
+                'ticketStatus.name',
+                'comments',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function getSubscribers(): Collection
+    {
+        $subscribers = new Collection([]);
+
+        if ($this->owner) {
+            $subscribers[$this->owner->id] = $this->owner;
+        }
+
+        if ($this->responsible) {
+            $subscribers[$this->responsible->id] = $this->responsible;
+        }
+
+        $this->comments->each(function($comment) use (&$subscribers) {
+            $subscribers->put($comment->user->id, $comment->user);
+        });
+
+        $accountSettings = app(AccountSettings::class);
+        if ($accountSettings->user_email_verification) {
+            $subscribers = $subscribers->filter(function ($subscriber) {
+                return $subscriber->email_verified_at;
+            });
+        }
+
+        return $subscribers;
+    }
+    
     /**
      * Get the priority that owns the Ticket.
      *
@@ -105,13 +134,13 @@ class Ticket extends Model
     }
 
     /**
-     * Get the problemCategory that owns the Ticket.
+     * Get the Category that owns the Ticket.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function problemCategory()
+    public function category()
     {
-        return $this->belongsTo(ProblemCategory::class);
+        return $this->belongsTo(Category::class);
     }
 
     /**

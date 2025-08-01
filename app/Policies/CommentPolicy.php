@@ -3,7 +3,9 @@
 namespace App\Policies;
 
 use App\Models\Comment;
+use App\Models\Ticket;
 use App\Models\User;
+use App\Settings\TicketSettings;
 
 class CommentPolicy
 {
@@ -26,8 +28,12 @@ class CommentPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, ?Ticket $ticket): bool
     {
+        if ($ticket) {
+            return !in_array($ticket->ticketStatus->id, app(TicketSettings::class)->closed_status);
+        }
+
         return true;
     }
 
@@ -36,7 +42,18 @@ class CommentPolicy
      */
     public function update(User $user, Comment $comment): bool
     {
-        return true;
+        // The admin unit can update tickets that are assigned to their specific unit.
+        if ($user->hasRole('Admin Unit')) {
+            return $user->id == $comment->user_id || $comment->ticket->unit_id == $user->unit_id;
+        }
+
+        // The staff unit can update tickets that have been assigned to them.
+        if ($user->hasRole('Staff Unit')) {
+            return $user->id == $comment->user_id || $comment->ticket->responsible_id == $user->id;
+        }
+
+        // The user can view their own ticket
+        return $user->id == $comment->user_id;
     }
 
     /**

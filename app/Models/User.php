@@ -1,56 +1,32 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
-use Carbon\Carbon;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use DutchCodingCompany\FilamentSocialite\Models\SocialiteUser;
 use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
-/**
- * Class User.
- *
- * @property int $id
- * @property null|int $unit_id
- * @property string $name
- * @property string $email
- * @property null|Carbon $email_verified_at
- * @property null|string $password
- * @property null|string $two_factor_secret
- * @property null|string $two_factor_recovery_codes
- * @property null|Carbon $two_factor_confirmed_at
- * @property null|string $remember_token
- * @property null|Carbon $created_at
- * @property null|Carbon $updated_at
- * @property null|string $identity
- * @property null|string $phone
- * @property null|int $user_level_id
- * @property bool $is_active
- * @property null|string $deleted_at
- * @property null|Unit $unit
- * @property Collection|Comment[] $comments
- * @property Collection|Ticket[] $tickets
- */
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasLocalePreference
 {
-    use SoftDeletes, HasRoles, HasSuperAdmin, HasFactory, Notifiable;
-    protected $table = 'users';
+    use SoftDeletes;
+    use HasRoles;
+    use HasSuperAdmin;
+    use HasFactory;
+    use Notifiable;
+    use LogsActivity;
 
     protected $casts = [
-        'unit_id' => 'int',
         'email_verified_at' => 'datetime',
         'two_factor_confirmed_at' => 'datetime',
-        'user_level_id' => 'int',
         'is_active' => 'bool',
     ];
 
@@ -75,6 +51,24 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'user_level_id',
         'is_active',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                '*',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    /**
+     * Get the user's preferred locale.
+     */
+    public function preferredLocale(): string
+    {
+        return app(\App\Settings\GeneralSettings::class)->site_locale;
+    }
 
     /**
      * Get the unit that owns the User.
@@ -121,7 +115,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
      *
      * Only active users can access the filament
      */
-    public function canAccessFilament(): bool
+    public function canAccessPanel(\Filament\Panel $panel): bool
     {
         return auth()->user()->is_active;
     }

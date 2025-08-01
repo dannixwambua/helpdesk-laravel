@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\TicketStatusResource\RelationManagers;
 
 use App\Models\Ticket;
-use Filament\Forms;
-use Filament\Resources\Form;
+use App\Settings\GeneralSettings;
+use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
 
 class TicketsRelationManager extends RelationManager
@@ -15,7 +14,7 @@ class TicketsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -23,13 +22,13 @@ class TicketsRelationManager extends RelationManager
                     ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime(app(GeneralSettings::class)->datetime_format)
                     ->translateLabel()
                     ->sortable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('problemCategory.name')
+                Tables\Columns\TextColumn::make('category.name')
                     ->searchable()
-                    ->label(__('Problem Category'))
+                    ->label(__('Category'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('ticketStatus.name')
                     ->label('Status')
@@ -39,7 +38,7 @@ class TicketsRelationManager extends RelationManager
             ->headerActions([])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn (Ticket $record): string => route('filament.resources.tickets.view', $record)),
+                    ->url(fn (Ticket $record): string => route('filament.admin.resources.tickets.view', $record)),
             ])
             ->bulkActions([]);
     }

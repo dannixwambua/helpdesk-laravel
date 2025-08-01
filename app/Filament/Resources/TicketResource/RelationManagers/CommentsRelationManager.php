@@ -3,50 +3,82 @@
 namespace App\Filament\Resources\TicketResource\RelationManagers;
 
 use App\Filament\Resources\TicketResource;
+use App\Models\Comment;
+use App\Models\Ticket;
+use App\Models\TicketStatus;
 use App\Models\User;
+use App\Settings\GeneralSettings;
+use App\Settings\TicketSettings;
 use Filament\Forms;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component as Livewire;
 
 class CommentsRelationManager extends RelationManager
 {
+    protected $listeners = ['refreshComments' => '$refresh'];
+
     protected static string $relationship = 'comments';
 
-    protected static ?string $recordTitleAttribute = 'comment';
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('Comments');
+    }
 
-    protected function isTablePaginationEnabled(): bool
+    public function isReadOnly(): bool
     {
         return false;
     }
 
-    public static function form(Form $form): Form
+    protected function canCreate(): bool
+    {
+        return Gate::allows('create', [$this->getTable()->getModel(), $this->ownerRecord]);
+    }
+
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Card::make()->schema([
+                Section::make()->schema([
+                    Forms\Components\Select::make('ticket_statuses_id')
+                        ->label(__('Change Status'))
+                        ->options(TicketStatus::all()->pluck('name', 'id'))
+                        ->searchable()
+                        ->default(fn(Livewire $livewire) => $livewire->ownerRecord->ticket_statuses_id)
+                        ->hiddenOn('edit')
+                        ->hidden(
+                            fn () => !auth()
+                                ->user()
+                                ->hasAnyRole(['Super Admin', 'Admin Unit', 'Staff Unit']),
+                        ),
+
                     Forms\Components\RichEditor::make('comment')
-                        ->required()
-                        ->maxLength(255),
+                        ->translateLabel()
+                        ->required(),
+
                     Forms\Components\FileUpload::make('attachments')
+                        ->translateLabel()
                         ->directory('comment-attachments/' . date('m-y'))
                         ->maxSize(2000)
-                        ->enableDownload(),
+                        ->downloadable(),
                 ])
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->modelLabel(__('Comment'))
             ->columns([
                 Stack::make([
                     Split::make([
@@ -56,7 +88,7 @@ class CommentsRelationManager extends RelationManager
                             ->grow(false),
                         TextColumn::make('created_at')
                             ->translateLabel()
-                            ->dateTime()
+                            ->dateTime(app(GeneralSettings::class)->datetime_format)
                             ->color('secondary'),
                     ]),
                     TextColumn::make('comment')
@@ -66,42 +98,40 @@ class CommentsRelationManager extends RelationManager
             ])
             ->filters([])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->mutateFormDataUsing(function (array $data): array {
-                    $data['user_id'] = auth()->id();
+                Tables\Actions\Action::make('refresh')
+                    ->translateLabel()
+                    ->outlined()
+                    ->dispatchSelf('refreshComments'),
 
-                    return $data;
-                })
-                    ->label('Tambah Komentar')
-                    ->after(function (Livewire $livewire) {
+                Tables\Actions\CreateAction::make()
+                    ->label(__('Add Comment'))
+                    ->mutateFormDataUsing(function (array $data, Livewire $livewire): array {
+                        $data['user_id'] = auth()->id();
+                        
+
+                        return $data;
+                    })
+                    ->before(function (array $data, Livewire $livewire) {
                         $ticket = $livewire->ownerRecord;
-
-                        if (auth()->user()->hasAnyRole(['Admin Unit', 'Staf Unit'])) {
-                            $receiver = $ticket->owner;
-                        } else {
-                            $receiver = User::whereHas(
-                                'roles',
-                                function ($q) {
-                                    $q->where('name', 'Admin Unit')
-                                        ->orWhere('name', 'Staf Unit');
-                                },
-                            )->get();
+                        if (array_key_exists('ticket_statuses_id', $data) && !empty($data['ticket_statuses_id'])) {
+                            $ticket->update(['ticket_statuses_id' => $data['ticket_statuses_id']]);
                         }
-
-                        Notification::make()
-                            ->title('Terdapat komentar baru pada tiket Anda')
-                            ->actions([
-                                Action::make('Lihat')
-                                    ->url(TicketResource::getUrl('view', ['record' => $ticket->id])),
-                            ])
-                            ->sendToDatabase($receiver);
+                    })
+                    ->after(function (array $data, Livewire $livewire) {
+                        $livewire->dispatch('refreshTicketFormView');
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('attachment')->action(function ($record) {
-                    return response()->download('storage/' . $record->attachments);
-                })->hidden(fn ($record) => $record->attachments == ''),
+                Tables\Actions\Action::make('attachment')
+                    ->translateLabel()
+                    ->action(function ($record) {
+                        return response()->download('storage/' . $record->attachments);
+                    })
+                    ->hidden(fn ($record) => $record->attachments == ''),
+
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->paginated(false);
     }
 }

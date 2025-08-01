@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 */
 
 Route::get('/', function () {
-    return view('landing');
+    return redirect()->route('filament.admin.pages.dashboard');
 });
 
 

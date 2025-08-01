@@ -1,37 +1,16 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
-/**
- * Class Comment.
- *
- * @property int $id
- * @property int $tiket_id
- * @property int $user_id
- * @property string $comment
- * @property null|Carbon $created_at
- * @property null|Carbon $updated_at
- * @property null|string $deleted_at
- * @property User $user
- * @property Ticket $ticket
- */
 class Comment extends Model
 {
     use SoftDeletes;
-    protected $table = 'comments';
-
-    protected $casts = [
-        'tiket_id' => 'int',
-        'user_id' => 'int',
-    ];
+    use LogsActivity;
 
     protected $fillable = [
         'tiket_id',
@@ -39,6 +18,17 @@ class Comment extends Model
         'comment',
         'attachments',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                '*',
+                'ticket.title',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     public function user()
     {
