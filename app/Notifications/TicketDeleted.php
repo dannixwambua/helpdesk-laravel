@@ -6,20 +6,18 @@ use App\Models\Ticket;
 use App\Settings\GeneralSettings;
 use App\Support\Notifications\Debounce;
 use App\Support\Notifications\ShouldBeDebounce;
-use Illuminate\Support\Str;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Support\Str;
 
-class TicketDeleted extends Notification implements ShouldQueue, ShouldBeDebounce
+class TicketDeleted extends Notification implements ShouldBeDebounce, ShouldQueue
 {
-    use Queueable;
     use Debounce;
+    use Queueable;
 
     protected $ticket;
 
@@ -95,18 +93,18 @@ class TicketDeleted extends Notification implements ShouldQueue, ShouldBeDebounc
         }
 
         return (new MailMessage)
-            ->subject($subjectPrefix . __('Ticket #:ticket deleted', [
-                'ticket' => $this->ticket->id, 
+            ->subject($subjectPrefix.__('Ticket #:ticket deleted', [
+                'ticket' => $this->ticket->id,
             ]))
-            ->greeting(__("Ticket") . ": {$this->ticket->title}")
-            ->line(__("Deleted by") . ": {$deletedBy}");
+            ->greeting(__('Ticket').": {$this->ticket->title}")
+            ->line(__('Deleted by').": {$deletedBy}");
     }
 
     public function toDatabase(object $notifiable): array
     {
         return FilamentNotification::make()
             ->title(__('Ticket #:ticket deleted', [
-                'ticket' => $this->ticket->id, 
+                'ticket' => $this->ticket->id,
             ]))
             ->body($this->ticket->title)
             ->getDatabaseMessage();

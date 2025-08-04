@@ -69,19 +69,19 @@ class General extends SettingsPage
                         Forms\Components\Select::make('site_timezone')
                             ->label(__('Timezone'))
                             ->helperText(__('Set the local server timezone for date display'))
-                            ->options(collect(\DateTimeZone::listIdentifiers(\DateTimeZone::ALL))->mapWithKeys(fn($item) => [$item => $item]))
+                            ->options(collect(\DateTimeZone::listIdentifiers(\DateTimeZone::ALL))->mapWithKeys(fn ($item) => [$item => $item]))
                             ->required(),
 
                         Forms\Components\Select::make('site_locale')
                             ->label(__('Locale'))
-                            ->options(collect(config('filament-language-switch.locales'))->map(fn($item) => $item['name']))
+                            ->options(collect(config('filament-language-switch.locales'))->map(fn ($item) => $item['name']))
                             ->required(),
 
                         Forms\Components\TextInput::make('datetime_format')
                             ->translateLabel()
                             ->helperText('https://www.php.net/manual/en/datetime.format.php')
                             ->required(),
-                    ])
+                    ]),
             ]);
     }
 }

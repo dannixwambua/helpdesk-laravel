@@ -6,9 +6,9 @@ use App\Models\Ticket;
 use App\Settings\GeneralSettings;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class TicketsRelationManager extends RelationManager
@@ -28,8 +28,7 @@ class TicketsRelationManager extends RelationManager
                     ->translateLabel()
                     ->required()
                     ->maxLength(255),
-            ])
-        ;
+            ]);
     }
 
     public function table(Table $table): Table
@@ -63,7 +62,6 @@ class TicketsRelationManager extends RelationManager
                     ->url(fn (Ticket $record): string => route('filament.admin.resources.tickets.view', $record)),
             ])
             ->bulkActions([
-            ])
-        ;
+            ]);
     }
 }

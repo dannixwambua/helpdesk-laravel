@@ -4,9 +4,9 @@ namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class TicketsRelationManager extends RelationManager
 {
@@ -36,7 +36,7 @@ class TicketsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('responsible.name')
                     ->translateLabel(),
                 Tables\Columns\TextColumn::make('ticket_status.name')
-                    ->label(__("Ticket Status")),
+                    ->label(__('Ticket Status')),
             ])
             ->filters([])
             ->headerActions([])

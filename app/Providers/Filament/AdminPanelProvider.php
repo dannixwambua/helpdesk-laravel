@@ -5,32 +5,31 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\TicketResource;
 use App\Settings\AccountSettings;
 use App\Settings\GeneralSettings;
+use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
+use DutchCodingCompany\FilamentSocialite\Provider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
-use Filament\Navigation\NavigationItem;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
-use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
-use DutchCodingCompany\FilamentSocialite\Provider;
-use Filament\Navigation\MenuItem;
-use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
-use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
-use Laravel\Socialite\Contracts\User as SocialiteUserContract;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
+use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
+use Laravel\Socialite\Contracts\User as SocialiteUserContract;
+use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 use Rmsramos\Activitylog\ActivitylogPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -50,12 +49,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()
-                    ->label(fn() => auth()->user()->name)
+                    ->label(fn () => auth()->user()->name)
                     ->url(fn (): string => EditProfilePage::getUrl())
                     ->icon('heroicon-m-user-circle')
                     ->visible(function (): bool {
-                        return auth()->user()->exists() 
-                            && !auth()->user()->socialiteUsers()->exists();
+                        return auth()->user()->exists()
+                            && ! auth()->user()->socialiteUsers()->exists();
                     }),
             ])
             ->plugins([
@@ -78,17 +77,19 @@ class AdminPanelProvider extends PanelProvider
                     ->slug('admin')
                     ->registration(function (string $provider, SocialiteUserContract $oauthUser, ?Authenticatable $user) {
                         $accountSettings = app(AccountSettings::class);
-                        return match($provider) {
+
+                        return match ($provider) {
                             'google' => $accountSettings->auth_google_registration,
                             'oauth0' => $accountSettings->auth_oauth0_registration,
                             'laravelpassport' => $accountSettings->auth_laravelpassport_registration,
                         };
+
                         return (bool) $user;
                     }),
 
                 ActivitylogPlugin::make()
                     ->navigationItem(false),
-                    
+
             ])
             ->navigationItems([
                 NavigationItem::make('my_tickets')
@@ -96,8 +97,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-ticket')
                     ->url(fn (): string => TicketResource::getUrl('index', ['tableFilters[only_my_tickets][isActive]' => true]))
                     ->sort(4)
-                    ->isActiveWhen(fn () => 
-                        request()->routeIs('filament.admin.resources.tickets.index')
+                    ->isActiveWhen(fn () => request()->routeIs('filament.admin.resources.tickets.index')
                         && collect(request()->query())->dot()->get('tableFilters.only_my_tickets.isActive')
                     ),
             ])

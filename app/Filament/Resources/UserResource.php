@@ -10,12 +10,12 @@ use App\Models\User;
 use App\Settings\GeneralSettings;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Illuminate\Support\Facades\Hash;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class UserResource extends Resource
@@ -72,8 +72,7 @@ class UserResource extends Resource
                 Forms\Components\Toggle::make('is_active')
                     ->translateLabel()
                     ->required(),
-            ])
-        ;
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -103,8 +102,7 @@ class UserResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),
-            ])
-        ;
+            ]);
     }
 
     public static function getRelations(): array
@@ -130,7 +128,6 @@ class UserResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ])
-        ;
+            ]);
     }
 }

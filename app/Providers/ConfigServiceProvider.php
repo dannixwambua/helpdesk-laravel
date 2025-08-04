@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
-use Illuminate\Support\Facades\Event;
 
 class ConfigServiceProvider extends ServiceProvider
 {
@@ -33,7 +31,7 @@ class ConfigServiceProvider extends ServiceProvider
         if ($generalSettings->site_title) {
             config(['app.name' => $generalSettings->site_title]);
         }
-        
+
         if ($generalSettings->site_url) {
             config(['app.url' => $generalSettings->site_url]);
         }
@@ -58,7 +56,7 @@ class ConfigServiceProvider extends ServiceProvider
                 'redirect' => url('admin/oauth/callback/google'),
             ]]);
         }
-        
+
         if ($accountSettings->auth_oauth0_enabled) {
             config(['services.auth0' => [
                 'client_id' => $accountSettings->auth_oauth0_client_id,
@@ -75,8 +73,8 @@ class ConfigServiceProvider extends ServiceProvider
                 'redirect' => url('admin/oauth/callback/laravelpassport'),
                 'host' => $accountSettings->auth_laravelpassport_host,
                 'authorize_uri' => $accountSettings->auth_laravelpassport_authorize_uri ?? 'oauth/authorize',
-                'token_uri'     => $accountSettings->auth_laravelpassport_token_uri ?? 'oauth/token',
-                'userinfo_uri'  => $accountSettings->auth_laravelpassport_userinfo_uri ?? 'api/user',
+                'token_uri' => $accountSettings->auth_laravelpassport_token_uri ?? 'oauth/token',
+                'userinfo_uri' => $accountSettings->auth_laravelpassport_userinfo_uri ?? 'api/user',
             ]]);
         }
     }

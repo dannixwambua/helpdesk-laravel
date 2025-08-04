@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use App\Settings\AccountSettings;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Ticket extends Model
 {
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $casts = [
         'status_updated_at' => 'datetime',
@@ -42,7 +42,7 @@ class Ticket extends Model
                         array_key_exists('ticket_statuses_id', $ticket->getOriginal())
                         && $ticket->getDirty()['ticket_statuses_id'] != $ticket->getOriginal()['ticket_statuses_id']
                     )
-                    || !array_key_exists('ticket_statuses_id', $ticket->getOriginal())
+                    || ! array_key_exists('ticket_statuses_id', $ticket->getOriginal())
                 )
             ) {
                 $ticket->status_updated_at = now();
@@ -79,7 +79,7 @@ class Ticket extends Model
             $subscribers[$this->responsible->id] = $this->responsible;
         }
 
-        $this->comments->each(function($comment) use (&$subscribers) {
+        $this->comments->each(function ($comment) use (&$subscribers) {
             $subscribers->put($comment->user->id, $comment->user);
         });
 
@@ -92,7 +92,7 @@ class Ticket extends Model
 
         return $subscribers;
     }
-    
+
     /**
      * Get the priority that owns the Ticket.
      *

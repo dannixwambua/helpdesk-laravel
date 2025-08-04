@@ -4,9 +4,9 @@ namespace App\Filament\Resources\TicketStatusResource\RelationManagers;
 
 use App\Models\Ticket;
 use App\Settings\GeneralSettings;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class TicketsRelationManager extends RelationManager
 {

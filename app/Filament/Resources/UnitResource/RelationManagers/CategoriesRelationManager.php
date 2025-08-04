@@ -4,9 +4,9 @@ namespace App\Filament\Resources\UnitResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class CategoriesRelationManager extends RelationManager
@@ -26,8 +26,7 @@ class CategoriesRelationManager extends RelationManager
                     ->translateLabel()
                     ->required()
                     ->maxLength(255),
-            ])
-        ;
+            ]);
     }
 
     public function table(Table $table): Table
@@ -48,7 +47,6 @@ class CategoriesRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ])
-        ;
+            ]);
     }
 }

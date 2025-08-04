@@ -21,7 +21,7 @@ class CategoryMigration extends Seeder
             'unit_id' => 1,
             'name' => ' Two at Sales Department',
         ]);
-        
+
         Category::updateOrCreate([
             'unit_id' => 2,
             'name' => ' One at Technical Support',

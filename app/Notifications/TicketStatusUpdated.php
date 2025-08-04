@@ -6,20 +6,19 @@ use App\Models\Ticket;
 use App\Settings\GeneralSettings;
 use App\Support\Notifications\Debounce;
 use App\Support\Notifications\ShouldBeDebounce;
-use Illuminate\Support\Str;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Support\Str;
 
-class TicketStatusUpdated extends Notification implements ShouldQueue, ShouldBeDebounce
+class TicketStatusUpdated extends Notification implements ShouldBeDebounce, ShouldQueue
 {
-    use Queueable;
     use Debounce;
+    use Queueable;
 
     protected $ticket;
 
@@ -90,12 +89,12 @@ class TicketStatusUpdated extends Notification implements ShouldQueue, ShouldBeD
         $subjectPrefix = "[{$siteTitle}] ";
 
         return (new MailMessage)
-            ->subject($subjectPrefix . __('Ticket #:ticket changed to :status', [
-                'ticket' => $this->ticket->id, 
+            ->subject($subjectPrefix.__('Ticket #:ticket changed to :status', [
+                'ticket' => $this->ticket->id,
                 'status' => __($this->ticket->ticketStatus->name),
             ]))
-            ->greeting(__("Ticket") . ": {$this->ticket->title}")
-            ->line(__("Status") . ": {$this->ticket->ticketStatus->name}")
+            ->greeting(__('Ticket').": {$this->ticket->title}")
+            ->line(__('Status').": {$this->ticket->ticketStatus->name}")
             ->action(__('View'), route('filament.admin.resources.tickets.view', $this->ticket));
     }
 
@@ -103,7 +102,7 @@ class TicketStatusUpdated extends Notification implements ShouldQueue, ShouldBeD
     {
         return FilamentNotification::make()
             ->title(__('Ticket #:ticket changed to :status', [
-                'ticket' => $this->ticket->id, 
+                'ticket' => $this->ticket->id,
                 'status' => __($this->ticket->ticketStatus->name),
             ]))
             ->body($this->ticket->title)

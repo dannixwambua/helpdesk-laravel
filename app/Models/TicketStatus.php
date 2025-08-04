@@ -9,10 +9,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class TicketStatus extends Model
 {
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     public $timestamps = false;
+
     protected $table = 'ticket_statuses';
 
     protected $fillable = [

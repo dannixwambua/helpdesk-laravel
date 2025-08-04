@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Ticket;
-use App\Models\TicketStatus;
+use App\Models\User;
 use App\Settings\TicketSettings;
 
 class TicketPolicy
@@ -34,7 +33,7 @@ class TicketPolicy
 
         // The staff unit can view tickets that have been assigned to them.
         if ($user->hasRole('Staff Unit')) {
-            return $user->id == $ticket->owner_id ||  $ticket->responsible_id == $user->id;
+            return $user->id == $ticket->owner_id || $ticket->responsible_id == $user->id;
         }
 
         // The user can view their own ticket
@@ -66,7 +65,7 @@ class TicketPolicy
 
         // The staff unit can update tickets that have been assigned to them.
         if ($user->hasRole('Staff Unit')) {
-            return $user->id == $ticket->owner_id ||  $ticket->responsible_id == $user->id;
+            return $user->id == $ticket->owner_id || $ticket->responsible_id == $user->id;
         }
 
         // The user can view their own ticket

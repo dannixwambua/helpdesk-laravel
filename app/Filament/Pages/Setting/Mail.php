@@ -2,9 +2,7 @@
 
 namespace App\Filament\Pages\Setting;
 
-use App\Models\Priority;
 use App\Models\Setting;
-use App\Models\TicketStatus;
 use App\Settings\MailSettings;
 use Filament\Forms;
 use Filament\Forms\Form;

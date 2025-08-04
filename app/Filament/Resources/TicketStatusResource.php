@@ -8,8 +8,8 @@ use App\Models\TicketStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -25,7 +25,7 @@ class TicketStatusResource extends Resource
     {
         return __('Status');
     }
-    
+
     public static function getPluralModelLabel(): string
     {
         return self::getModelLabel();
@@ -93,5 +93,4 @@ class TicketStatusResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
-
 }

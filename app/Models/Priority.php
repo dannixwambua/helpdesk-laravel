@@ -9,7 +9,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Priority extends Model
 {
     use LogsActivity;
-    
+
     public $timestamps = false;
 
     protected $fillable = [

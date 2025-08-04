@@ -44,9 +44,9 @@ return [
         'base_url' => env('AUTH0_BASE_URL'),
     ],
 
-    'laravelpassport' => [    
-        'client_id' => env('LARAVELPASSPORT_CLIENT_ID', 28),  
-        'client_secret' => env('LARAVELPASSPORT_CLIENT_SECRET', 'dkM3TJYeLooBNQsJxW6jRB3YZBW9oAN7njSylBqE'),  
+    'laravelpassport' => [
+        'client_id' => env('LARAVELPASSPORT_CLIENT_ID', 28),
+        'client_secret' => env('LARAVELPASSPORT_CLIENT_SECRET', 'dkM3TJYeLooBNQsJxW6jRB3YZBW9oAN7njSylBqE'),
         'redirect' => env('LARAVELPASSPORT_REDIRECT_URI', 'http://localhost:8080/admin/oauth/callback/laravelpassport'),
         'host' => env('LARAVELPASSPORT_HOST', 'http://localhost:8101'),
         'userinfo_uri' => 'api/user/me',

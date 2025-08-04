@@ -2,27 +2,27 @@
 
 namespace App\Models;
 
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use DutchCodingCompany\FilamentSocialite\Models\SocialiteUser;
 use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
+use DutchCodingCompany\FilamentSocialite\Models\SocialiteUser;
+use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasLocalePreference
+class User extends Authenticatable implements FilamentUser, HasLocalePreference, MustVerifyEmail
 {
-    use SoftDeletes;
+    use HasFactory;
     use HasRoles;
     use HasSuperAdmin;
-    use HasFactory;
-    use Notifiable;
     use LogsActivity;
+    use Notifiable;
+    use SoftDeletes;
 
     protected $casts = [
         'email_verified_at' => 'datetime',

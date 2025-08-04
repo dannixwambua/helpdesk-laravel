@@ -4,9 +4,9 @@ namespace App\Filament\Resources\UnitResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class UsersRelationManager extends RelationManager
@@ -26,8 +26,7 @@ class UsersRelationManager extends RelationManager
                     ->translateLabel()
                     ->required()
                     ->maxLength(255),
-            ])
-        ;
+            ]);
     }
 
     public function table(Table $table): Table
@@ -52,7 +51,6 @@ class UsersRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\DissociateBulkAction::make(),
-            ])
-        ;
+            ]);
     }
 }
