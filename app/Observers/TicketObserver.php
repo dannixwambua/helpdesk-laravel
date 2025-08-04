@@ -42,11 +42,11 @@ class TicketObserver
 
         $authUser = auth()->user();
 
-        if ($staffUsers->has($authUser->id)) {
+        if ($authUser && $staffUsers->has($authUser->id)) {
             $staffUsers->pull($authUser->id);
         }
 
-        $staffUsers->each(fn ($user) => $user->notify(new TicketCreated($ticket)));
+        $staffUsers->each(fn($user) => $user->notify(new TicketCreated($ticket)));
     }
 
     /**
@@ -54,7 +54,8 @@ class TicketObserver
      */
     public function updated(Ticket $ticket): void
     {
-        if (array_key_exists('ticket_statuses_id', $ticket->getDirty())
+        if (
+            array_key_exists('ticket_statuses_id', $ticket->getDirty())
             && (
                 (
                     array_key_exists('ticket_statuses_id', $ticket->getOriginal())
@@ -70,7 +71,7 @@ class TicketObserver
                 $subscribers->pull($authUser->id);
             }
 
-            $subscribers->each(fn ($subscriber) => $subscriber->notify(new TicketStatusUpdated($ticket)));
+            $subscribers->each(fn($subscriber) => $subscriber->notify(new TicketStatusUpdated($ticket)));
         }
     }
 
