@@ -29,6 +29,6 @@ return [
             'comment' => 'Comentário',
             'attachments' => 'Anexos',
             'tiket_id' => 'Ticket #',
-        ]
+        ],
     ],
 ];

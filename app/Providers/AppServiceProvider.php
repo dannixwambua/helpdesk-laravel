@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use Livewire\Livewire;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,11 +24,11 @@ class AppServiceProvider extends ServiceProvider
     {
         if (env('LIVEWIRE_BASE_PATH')) {
             Livewire::setScriptRoute(function ($handle) {
-                return Route::get(env('LIVEWIRE_BASE_PATH') . '/vendor/livewire.js', $handle);
+                return Route::get(env('LIVEWIRE_BASE_PATH').'/vendor/livewire.js', $handle);
             });
 
             Livewire::setUpdateRoute(function ($handle) {
-                return Route::get(env('LIVEWIRE_BASE_PATH') . '/update', $handle);
+                return Route::get(env('LIVEWIRE_BASE_PATH').'/update', $handle);
             });
         }
 

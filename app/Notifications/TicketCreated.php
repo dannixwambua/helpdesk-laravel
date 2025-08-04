@@ -6,20 +6,19 @@ use App\Models\Ticket;
 use App\Settings\GeneralSettings;
 use App\Support\Notifications\Debounce;
 use App\Support\Notifications\ShouldBeDebounce;
-use Illuminate\Support\Str;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Support\Str;
 
-class TicketCreated extends Notification implements ShouldQueue, ShouldBeDebounce
+class TicketCreated extends Notification implements ShouldBeDebounce, ShouldQueue
 {
-    use Queueable;
     use Debounce;
+    use Queueable;
 
     protected $ticket;
 
@@ -90,18 +89,18 @@ class TicketCreated extends Notification implements ShouldQueue, ShouldBeDebounc
         $subjectPrefix = "[{$siteTitle}] ";
 
         return (new MailMessage)
-            ->subject($subjectPrefix . __('Ticket #:ticket created', [
-                'ticket' => $this->ticket->id, 
+            ->subject($subjectPrefix.__('Ticket #:ticket created', [
+                'ticket' => $this->ticket->id,
             ]))
-            ->greeting(__("Ticket") . ": {$this->ticket->title}")
-            ->action(__('View'), route('filament.admin.resources.tickets.view', $this->ticket));;
+            ->greeting(__('Ticket').": {$this->ticket->title}")
+            ->action(__('View'), route('filament.admin.resources.tickets.view', $this->ticket));
     }
 
     public function toDatabase(object $notifiable): array
     {
         return FilamentNotification::make()
             ->title(__('Ticket #:ticket created', [
-                'ticket' => $this->ticket->id, 
+                'ticket' => $this->ticket->id,
             ]))
             ->body($this->ticket->title)
             ->actions([

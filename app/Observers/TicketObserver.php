@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\User;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Notifications\TicketCreated;
 use App\Notifications\TicketDeleted;
 use App\Notifications\TicketRestored;
@@ -23,20 +23,20 @@ class TicketObserver
         $accountSettings = app(AccountSettings::class);
 
         $usersQuery = User::whereNotNull('email')
-            ->when($accountSettings->user_email_verification, function($query) {
+            ->when($accountSettings->user_email_verification, function ($query) {
                 $query->whereNotNull('email_verified_at');
             });
 
         $usersQuery->clone()->role('Staff Unit')
             ->where('unit_id', $ticket->unit_id)
             ->get()
-            ->each(function($user) use (&$staffUsers) {
+            ->each(function ($user) use (&$staffUsers) {
                 $staffUsers->put($user->id, $user);
             });
 
         $usersQuery->clone()->role('Global Staff')
             ->get()
-            ->each(function($user) use (&$staffUsers) {
+            ->each(function ($user) use (&$staffUsers) {
                 $staffUsers->put($user->id, $user);
             });
 
@@ -60,7 +60,7 @@ class TicketObserver
                     array_key_exists('ticket_statuses_id', $ticket->getOriginal())
                     && $ticket->getDirty()['ticket_statuses_id'] != $ticket->getOriginal()['ticket_statuses_id']
                 )
-                || !array_key_exists('ticket_statuses_id', $ticket->getOriginal())
+                || ! array_key_exists('ticket_statuses_id', $ticket->getOriginal())
             )
         ) {
             $authUser = auth()->user();

@@ -3,8 +3,6 @@
 namespace App\Support\Activitylog;
 
 use Closure;
-use Filament\Infolists\Components\Entry;
-use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
 use Rmsramos\Activitylog\Infolists\Components\TimeLinePropertiesEntry as RmsramosTimeLinePropertiesEntry;
 use Rmsramos\Activitylog\Infolists\Concerns\HasModifyState;
@@ -14,7 +12,7 @@ class TimeLinePropertiesEntry extends RmsramosTimeLinePropertiesEntry
     use HasModifyState;
 
     protected ?Closure $modifyProperties = null;
-    
+
     protected function setup(): void
     {
         parent::setup();
@@ -45,12 +43,12 @@ class TimeLinePropertiesEntry extends RmsramosTimeLinePropertiesEntry
         }
 
         if (! empty($properties)) {
-            $changes    = $this->getPropertyChanges($properties);
+            $changes = $this->getPropertyChanges($properties);
             $causerName = $this->getCauserName($state['causer']);
 
             return new HtmlString(trans('activitylog::infolists.components.updater_updated', [
-                'causer'  => $causerName,
-                'event'   => __('activitylog::action.event.' . $state['event']),
+                'causer' => $causerName,
+                'event' => __('activitylog::action.event.'.$state['event']),
                 'changes' => implode('<br>', $changes),
             ]));
         }
@@ -84,14 +82,14 @@ class TimeLinePropertiesEntry extends RmsramosTimeLinePropertiesEntry
             if (isset($oldValues[$key]) && $oldValues[$key] != $newValue) {
                 $changes[] = trans('activitylog::infolists.components.from_oldvalue_to_newvalue',
                     [
-                        'key'       => $key,
+                        'key' => $key,
                         'old_value' => htmlspecialchars($oldValue),
                         'new_value' => htmlspecialchars($newValue),
                     ]);
             } else {
                 $changes[] = trans('activitylog::infolists.components.to_newvalue',
                     [
-                        'key'       => $key,
+                        'key' => $key,
                         'new_value' => htmlspecialchars($newValue),
                     ]);
             }
@@ -117,5 +115,4 @@ class TimeLinePropertiesEntry extends RmsramosTimeLinePropertiesEntry
     {
         return is_array($value) ? json_encode($value) : $value ?? '—';
     }
-
 }

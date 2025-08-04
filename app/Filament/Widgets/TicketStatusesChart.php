@@ -9,27 +9,22 @@ class TicketStatusesChart extends ApexChartWidget
 {
     /**
      * Chart Id
-     *
-     * @var string
      */
     protected static ?string $chartId = 'ticketStatusesChart';
 
     /**
      * Widget Title
-     *
-     * @var string|null
      */
     protected static ?string $heading = 'Tickets';
 
     /**
      * Chart options (series, labels, types, size, animations...)
      * https://apexcharts.com/docs/options
-     *
-     * @return array
      */
     protected function getOptions(): array
     {
         $ticketStatuses = TicketStatus::select('id', 'name', 'color')->withCount(['tickets'])->get();
+
         return [
             'chart' => [
                 'type' => 'pie',

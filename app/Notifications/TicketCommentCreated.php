@@ -6,20 +6,19 @@ use App\Models\Comment;
 use App\Settings\GeneralSettings;
 use App\Support\Notifications\Debounce;
 use App\Support\Notifications\ShouldBeDebounce;
-use Illuminate\Support\Str;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
-class TicketCommentCreated extends Notification implements ShouldQueue, ShouldBeDebounce
+class TicketCommentCreated extends Notification implements ShouldBeDebounce, ShouldQueue
 {
-    use Queueable;
     use Debounce;
+    use Queueable;
 
     protected $comment;
 
@@ -67,6 +66,7 @@ class TicketCommentCreated extends Notification implements ShouldQueue, ShouldBe
     public function getDebounceCacheKey(object $notifiable, string $channel): string
     {
         $className = Str::slug(__CLASS__);
+
         return "{$className}-{$channel}-{$notifiable->id}:{$this->comment->id}";
     }
 
@@ -79,11 +79,11 @@ class TicketCommentCreated extends Notification implements ShouldQueue, ShouldBe
         $subjectPrefix = "[{$siteTitle}] ";
 
         return (new MailMessage)
-            ->subject($subjectPrefix . __('New comment on ticket #:ticket', [
-                'ticket' => $this->comment->ticket->id, 
+            ->subject($subjectPrefix.__('New comment on ticket #:ticket', [
+                'ticket' => $this->comment->ticket->id,
             ]))
-            ->greeting((__("Ticket") . ": {$this->comment->ticket->title}"))
-            ->line(new HtmlString(__("Comment") . ": {$this->comment->comment}"))
+            ->greeting((__('Ticket').": {$this->comment->ticket->title}"))
+            ->line(new HtmlString(__('Comment').": {$this->comment->comment}"))
             ->action(__('View'), route('filament.admin.resources.tickets.view', $this->comment->ticket));
     }
 
@@ -91,7 +91,7 @@ class TicketCommentCreated extends Notification implements ShouldQueue, ShouldBe
     {
         return FilamentNotification::make()
             ->title(__('New comment on ticket #:ticket', [
-                'ticket' => $this->comment->ticket->id, 
+                'ticket' => $this->comment->ticket->id,
             ]))
             ->body($this->comment->ticket->title)
             ->actions([
@@ -99,7 +99,7 @@ class TicketCommentCreated extends Notification implements ShouldQueue, ShouldBe
                     ->translateLabel()
                     ->button()
                     ->url(route('filament.admin.resources.tickets.view', $this->comment->ticket)),
-                ])
+            ])
             ->getDatabaseMessage();
     }
 

@@ -21,6 +21,7 @@
         "rmsramos/activitylog": "^1.0",
         "socialiteproviders/auth0": "^4.2",
         "socialiteproviders/laravelpassport": "^4.3",
+        "spatie/laravel-settings": "*",
         "stechstudio/filament-impersonate": "^3.16"
     },
     "require-dev": {

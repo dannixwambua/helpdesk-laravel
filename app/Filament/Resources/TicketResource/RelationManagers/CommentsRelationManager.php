@@ -2,24 +2,17 @@
 
 namespace App\Filament\Resources\TicketResource\RelationManagers;
 
-use App\Filament\Resources\TicketResource;
-use App\Models\Comment;
-use App\Models\Ticket;
 use App\Models\TicketStatus;
-use App\Models\User;
 use App\Settings\GeneralSettings;
-use App\Settings\TicketSettings;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Notification;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component as Livewire;
@@ -54,10 +47,10 @@ class CommentsRelationManager extends RelationManager
                         ->label(__('Change Status'))
                         ->options(TicketStatus::all()->pluck('name', 'id'))
                         ->searchable()
-                        ->default(fn(Livewire $livewire) => $livewire->ownerRecord->ticket_statuses_id)
+                        ->default(fn (Livewire $livewire) => $livewire->ownerRecord->ticket_statuses_id)
                         ->hiddenOn('edit')
                         ->hidden(
-                            fn () => !auth()
+                            fn () => ! auth()
                                 ->user()
                                 ->hasAnyRole(['Super Admin', 'Admin Unit', 'Staff Unit']),
                         ),
@@ -68,10 +61,10 @@ class CommentsRelationManager extends RelationManager
 
                     Forms\Components\FileUpload::make('attachments')
                         ->translateLabel()
-                        ->directory('comment-attachments/' . date('m-y'))
+                        ->directory('comment-attachments/'.date('m-y'))
                         ->maxSize(2000)
                         ->downloadable(),
-                ])
+                ]),
             ]);
     }
 
@@ -107,13 +100,12 @@ class CommentsRelationManager extends RelationManager
                     ->label(__('Add Comment'))
                     ->mutateFormDataUsing(function (array $data, Livewire $livewire): array {
                         $data['user_id'] = auth()->id();
-                        
 
                         return $data;
                     })
                     ->before(function (array $data, Livewire $livewire) {
                         $ticket = $livewire->ownerRecord;
-                        if (array_key_exists('ticket_statuses_id', $data) && !empty($data['ticket_statuses_id'])) {
+                        if (array_key_exists('ticket_statuses_id', $data) && ! empty($data['ticket_statuses_id'])) {
                             $ticket->update(['ticket_statuses_id' => $data['ticket_statuses_id']]);
                         }
                     })
@@ -125,7 +117,7 @@ class CommentsRelationManager extends RelationManager
                 Tables\Actions\Action::make('attachment')
                     ->translateLabel()
                     ->action(function ($record) {
-                        return response()->download('storage/' . $record->attachments);
+                        return response()->download('storage/'.$record->attachments);
                     })
                     ->hidden(fn ($record) => $record->attachments == ''),
 

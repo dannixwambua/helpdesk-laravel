@@ -9,9 +9,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Category extends Model
 {
-    use SoftDeletes;
     use LogsActivity;
-    
+    use SoftDeletes;
+
     public $timestamps = false;
 
     protected $fillable = [

@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
         $superAdmin = User::updateOrCreate([
             'name' => 'Super Admin',
             'email' => 'superadmin@example.com',
+            'password' => bcrypt('password'),
         ]);
         $superAdmin->syncRoles('Super Admin');
 
@@ -23,6 +24,7 @@ class UserSeeder extends Seeder
         $adminUnit = User::updateOrCreate([
             'name' => 'Admin Unit',
             'email' => 'adminunit@example.com',
+            'password' => bcrypt('password'),
             'unit_id' => 1,
         ]);
         $adminUnit->syncRoles('Admin Unit');
@@ -31,6 +33,7 @@ class UserSeeder extends Seeder
         $staffUnit = User::updateOrCreate([
             'name' => 'Staff Unit',
             'email' => 'staffunit@example.com',
+            'password' => bcrypt('password'),
             'unit_id' => 1,
         ]);
         $staffUnit->syncRoles('Staff Unit');
@@ -39,6 +42,7 @@ class UserSeeder extends Seeder
         $staffUnit = User::updateOrCreate([
             'name' => 'User',
             'email' => 'user@example.com',
+            'password' => bcrypt('password'),
         ]);
     }
 }

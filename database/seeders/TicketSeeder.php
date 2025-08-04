@@ -14,8 +14,8 @@ class TicketSeeder extends Seeder
     {
         Ticket::updateOrCreate([
             'priority_id' => 1,
-            'unit_id'   => 1,
-            'owner_id'  => 1,
+            'unit_id' => 1,
+            'owner_id' => 1,
             'category_id' => 1,
             'title' => 'This is a sample ticket',
             'description' => 'This is a descriptions',

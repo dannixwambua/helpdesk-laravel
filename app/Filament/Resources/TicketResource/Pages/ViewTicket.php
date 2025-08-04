@@ -6,7 +6,6 @@ use App\Filament\Resources\TicketResource;
 use App\Support\Activitylog\ActivityLogTimelineSimpleAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Support\HtmlString;
 
 class ViewTicket extends ViewRecord
 {
@@ -25,8 +24,8 @@ class ViewTicket extends ViewRecord
             ActivityLogTimelineSimpleAction::make('timeline')
                 ->label(__('Histórico'))
                 ->withRelations(['comments'])
-                ->modifyProperties(function(array $properties) {
-                    $newProperties = array_map(fn() => [], array_flip(array_keys($properties)));
+                ->modifyProperties(function (array $properties) {
+                    $newProperties = array_map(fn () => [], array_flip(array_keys($properties)));
 
                     $mappedProperties = [
                         'title' => __('Title'),

@@ -4,22 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TicketResource\Pages;
 use App\Filament\Resources\TicketResource\RelationManagers\CommentsRelationManager;
-use App\Models\Priority;
 use App\Models\Category;
+use App\Models\Priority;
 use App\Models\Ticket;
 use App\Models\TicketStatus;
 use App\Models\Unit;
 use App\Models\User;
 use App\Settings\GeneralSettings;
 use App\Settings\TicketSettings;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Support\Colors\Color;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -39,12 +38,14 @@ class TicketResource extends Resource
     public static function getNavigationItems(): array
     {
         $navigationsItems = parent::getNavigationItems();
-        $navigationsItems[0]->isActiveWhen(function() {
-            return request()->routeIs(static::getRouteBaseName() . '.*')
-                && !collect(request()->query())->dot()->get('tableFilters.only_my_tickets.isActive');
+        $navigationsItems[0]->isActiveWhen(function () {
+            return request()->routeIs(static::getRouteBaseName().'.*')
+                && ! collect(request()->query())->dot()->get('tableFilters.only_my_tickets.isActive');
         });
+
         return $navigationsItems;
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -52,7 +53,7 @@ class TicketResource extends Resource
                 Section::make()->schema([
                     Forms\Components\Select::make('unit_id')
                         ->label(__('Work Unit'))
-                        ->options(Unit::where(function($query) {
+                        ->options(Unit::where(function ($query) {
                             $user = auth()->user();
 
                             if ($user->hasAnyRole(['Super Admin'])) {
@@ -82,7 +83,7 @@ class TicketResource extends Resource
                     Forms\Components\Select::make('category_id')
                         ->label(__('Category'))
                         ->options(function (callable $get, callable $set) {
-                            return Category::where(function($query) use ($get) {
+                            return Category::where(function ($query) use ($get) {
                                 $query->whereNull('unit_id');
                                 if ($get('unit_id')) {
                                     $query->orWhere('unit_id', $get('unit_id'));
@@ -132,7 +133,7 @@ class TicketResource extends Resource
                         ->required()
                         ->hiddenOn('create')
                         ->hidden(
-                            fn () => !auth()
+                            fn () => ! auth()
                                 ->user()
                                 ->hasAnyRole(['Super Admin', 'Admin Unit', 'Staff Unit']),
                         ),
@@ -157,7 +158,7 @@ class TicketResource extends Resource
                         ->required()
                         ->hiddenOn('create')
                         ->hidden(
-                            fn () => !auth()
+                            fn () => ! auth()
                                 ->user()
                                 ->hasAnyRole(['Super Admin', 'Admin Unit']),
                         ),
@@ -218,7 +219,7 @@ class TicketResource extends Resource
                     ->label(__('Status'))
                     ->sortable()
                     ->badge()
-                    ->color(function(Ticket $ticket) {
+                    ->color(function (Ticket $ticket) {
                         return $ticket->ticketStatus->color ? Color::hex($ticket->ticketStatus->color) : 'gray';
                     }),
             ])
@@ -312,7 +313,6 @@ class TicketResource extends Resource
                 $query->where('tickets.owner_id', $user->id);
             }
         })
-        ->withoutGlobalScopes([SoftDeletingScope::class]);
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
-
 }

@@ -31,7 +31,7 @@ class CommentPolicy
     public function create(User $user, ?Ticket $ticket): bool
     {
         if ($ticket) {
-            return !in_array($ticket->ticketStatus->id, app(TicketSettings::class)->closed_status);
+            return ! in_array($ticket->ticketStatus->id, app(TicketSettings::class)->closed_status);
         }
 
         return true;
