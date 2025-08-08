@@ -4,25 +4,25 @@ namespace App\Settings;
 
 class MailSettings extends Settings
 {
-    public string $mailer;
+    public string $mailer = '';
 
-    public string $smtp_scheme;
+    public string $smtp_scheme = 'tls'; // or 'ssl' as default
 
-    public string $smtp_host;
+    public string $smtp_host = '';
 
-    public int $smtp_port;
+    public int $smtp_port = 25;  // Default SMTP port
 
-    public string $smtp_username;
+    public string $smtp_username = '';
 
-    public string $smtp_password;
+    public string $smtp_password = '';
 
-    public string $smtp_localdomain;
+    public string $smtp_localdomain = '';
 
-    public string $sendmail_path;
+    public string $sendmail_path = '';
 
-    public string $from_address;
+    public string $from_address = '';
 
-    public string $from_name;
+    public string $from_name = '';
 
     public static function group(): string
     {
